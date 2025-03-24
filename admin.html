@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+</head>
+<body>
+    <h2>Admin Panel - Update Match Results</h2>
+    <form action="/update_result" method="POST">
+        <label>Match:</label>
+        <select name="match">
+            <option value="CSK vs MI">CSK vs MI</option>
+            <option value="RCB vs KKR">RCB vs KKR</option>
+            <option value="SRH vs DC">SRH vs DC</option>
+        </select><br><br>
+
+        <label>Winning Team:</label>
+        <select name="winning_team">
+            <option value="CSK">CSK</option>
+            <option value="MI">MI</option>
+            <option value="RCB">RCB</option>
+            <option value="KKR">KKR</option>
+            <option value="SRH">SRH</option>
+            <option value="DC">DC</option>
+        </select><br><br>
+
+        <button type="submit">Update Result</button>
+    </form>
+
+    <h3>Betting Data</h3>
+    <table border="1">
+        <tr>
+            <th>Username</th>
+            <th>Match</th>
+            <th>Team</th>
+            <th>Amount</th>
+            <th>Result</th>
+            <th>Profit/Loss</th>
+        </tr>
+        {% for bet in bets %}
+        <tr>
+            <td>{{ bet["Username"] }}</td>
+            <td>{{ bet["Match"] }}</td>
+            <td>{{ bet["Team"] }}</td>
+            <td>{{ bet["Amount"] }}</td>
+            <td>{{ bet["Result"] }}</td>
+            <td>{{ bet["Profit/Loss"] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br>
+    <a href="/">Back to Betting Page</a>
+</body>
+</html>

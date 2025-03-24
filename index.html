@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>IPL 2025 Betting</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        .ongoing { background-color: #f8d7da; font-weight: bold; } /* Highlight ongoing matches */
+        .past { color: #6c757d; } /* Dim past matches */
+		
+		.bet-options {
+		display: flex;
+		gap: 5px; /* Reduce space between elements */
+		align-items: center;
+		}
+		
+		.bet-amount, .team-select {
+		width: 150px; /* Reduce width */
+		font-size: 14px;
+		padding: 2px;
+		}
+
+		.bet-btn {
+		padding: 4px 10px;
+		font-size: 14px;
+		}
+
+		.ongoing {
+		background-color: #d4edda; /* Light green for ongoing matches */
+		font-weight: bold;
+		}
+
+		.past {
+		background-color: #f8d7da; /* Light red for past matches */
+		}
+
+		thead {
+		background-color: #ffc107 !important; /* Yellow header */
+		}
+		
+		thead select {
+		width: 120px;
+		font-size: 14px;
+		padding: 3px;
+}
+
+    </style>
+</head>
+<body class="container mt-4">
+    <h2 class="text-center text-primary">IPL 2025 Betting</h2>
+
+    <!-- User Info and Leaderboard Link at the Top -->
+    <div class="d-flex justify-content-between align-items-center bg-light p-3 rounded shadow">
+        <tr>
+		<div>
+		<th>
+            <label class="fw-bold">Username:</label>
+            <select class="form-select username">
+                <option value="">-- Select Username --</option>
+                <option value="User1">Uday</option>
+                <option value="User2">Veerendra</option>
+                <option value="User3">Mohan</option>
+                <option value="User4">Seshi</option>
+				<option value="User4">Sagar</option>
+				<option value="User4">Sattibabu</option>
+				<option value="User4">Kishore</option>
+				<option value="User4">Kakarla</option>
+				<option value="User4">Rahul</option>
+				<option value="User4">Chunchu</option>
+				<option value="User4">Mohsin</option>
+            </select>
+		</th>
+        </div>
+        <div>
+		<th>
+            <label class="fw-bold">Bet Amount:</label>
+            <select class="form-select bet-amount-header">
+                <option value="">-- Select Amount --</option>
+                <option value="100">100</option>
+                <option value="200">200</option>
+            </select>
+		</th>
+        </div>
+        <a href="/leaderboard" class="btn btn-success">View Leaderboard</a>
+    </div>
+
+    <!-- IPL Schedule with Betting Options -->
+    <h3 class="mt-4">IPL 2025 Schedule</h3>
+    <table class="table table-bordered table-hover">
+        <thead class="table-warning">
+                <th>Date</th>
+                <th>Day</th>
+                <th>Match</th>
+                <th>Result</th>
+				<th>Odds</th>
+                <th>Bet</th>
+        </tr>
+        </thead>
+<tbody>
+    {% if ipl_schedule %}
+        {% for match in ipl_schedule %}
+        <tr class="{{ match.Status }}">
+            <td>{{ match.Date }}</td>  <!-- Make sure column names match -->
+            <td>{{ match.Day }}</td>
+            <td>{{ match.Match }}</td>
+            <td>{{ match.Result if match.Result else "Pending" }}</td>
+			<td>
+			    {% if match.Odds %}
+					{{ match.Odds[0] }} vs {{ match.Odds[1] }}
+				{% else %}
+					No odds placed yet
+				{% endif %}
+			</td>
+<td class="bet-options">
+    <select class="form-select team-select" {% if match.Result and match.Result != "Pending" %}disabled{% endif %}>
+        <option value="">-- Select Team --</option>
+        {% if " vs " in match.Match %}
+            {% set teams = match.Match.split(" vs ") %}
+            <option value="{{ teams[0] }}">{{ teams[0] }}</option>
+            <option value="{{ teams[1] }}">{{ teams[1] }}</option>
+        {% endif %}
+    </select>
+
+
+    <button class="btn btn-primary bet-btn" data-match="{{ match.Match }}" 
+        {% if match.Result and match.Result != "Pending" %}disabled{% endif %}>
+        Place Bet
+    </button>
+</td>
+
+        </tr>
+        {% endfor %}
+    {% else %}
+        <tr><td colspan="5" class="text-center">No matches available</td></tr>
+    {% endif %}
+</tbody>
+
+    </table>
+
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelectorAll(".bet-btn").forEach(button => {
+                button.addEventListener("click", function() {
+                    let username = document.getElementById("username").value;
+                    let betAmount = document.getElementById("betAmount").value;
+                    let match = this.getAttribute("data-match");
+                    let team = this.parentElement.querySelector(".team-select").value;
+
+                    if (!username || !betAmount || !team) {
+                        alert("Please fill in all fields before placing a bet.");
+                        return;
+                    }
+
+                    fetch("/place_bet", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                        body: `username=${username}&match=${match}&team=${team}&amount=${betAmount}`
+                    }).then(response => response.text()).then(data => {
+                        alert("Bet placed successfully!");
+                        window.location.reload();
+                    });
+                });
+            });
+        });
+    </script>
+	
+	
+	<!-- Bet Confirmation Modal -->
+	<div class="modal fade" id="betConfirmationModal" tabindex="-1" aria-labelledby="betConfirmationModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="betConfirmationModalLabel">Bet Placed Successfully!</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					Your bet has been successfully placed. Good luck!
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+  function showBetConfirmation() {
+    var myModal = new bootstrap.Modal(document.getElementById('betConfirmationModal'));
+    myModal.show();
+  }
+
+  // Trigger this function when a bet is placed (replace 'bet-btn' with the actual class/ID of your bet button)
+  document.querySelectorAll('.bet-btn').forEach(button => {
+    button.addEventListener('click', function() {
+      showBetConfirmation();
+    });
+  });
+</script>
+
+
+</body>
+</html>
