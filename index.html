@@ -197,6 +197,20 @@
       showBetConfirmation();
     });
   });
+
+async function getSheetData() {
+    const sheetID = "205719425";
+    const url = `https://docs.google.com/spreadsheets/d/${205719425}/gviz/tq?tqx=out:json`;
+
+    const response = await fetch(url);
+    const text = await response.text();
+    const json = JSON.parse(text.substring(47).slice(0, -2)); // Remove extra characters
+    
+    console.log(json.table.rows); // Display data in console
+}
+
+getSheetData();
+		
 </script>
 
 
